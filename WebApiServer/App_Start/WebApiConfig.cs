@@ -5,6 +5,10 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Serialization;
+using Microsoft.Practices.Unity;
+using WebApiServer.DAL;
+using WebApiServer.Repositories.Customers;
+using WebApiServer.DependencyInjection;
 
 namespace WebApiServer
 {
@@ -12,6 +16,14 @@ namespace WebApiServer
     {
         public static void Register(HttpConfiguration config)
         {
+
+            var container = new UnityContainer();
+            container.RegisterType<IUnitOfWork, UnitOfWork>(new HierarchicalLifetimeManager());            
+            container.RegisterType<ICustomersRepository, CustomersRepositoryEF>(new HierarchicalLifetimeManager());
+
+
+            config.DependencyResolver = new UnityResolver(container);
+
             // Web API configuration and services
             // Configure Web API to use only bearer token authentication.
             config.SuppressDefaultHostAuthentication();
